@@ -27,6 +27,7 @@ class _AddProductBottomSheetState extends State<AddProductBottomSheet> {
   
 
   final TextEditingController nombreController = TextEditingController();
+  final TextEditingController tipoController = TextEditingController();
   final TextEditingController precioController = TextEditingController();
   final TextEditingController cantidadController = TextEditingController();
   final TextEditingController descuentoController = TextEditingController();
@@ -72,6 +73,8 @@ class _AddProductBottomSheetState extends State<AddProductBottomSheet> {
             
             CustomTextField(name: "Nombre del producto", variable: nombreController, multiline: true),
 
+            CustomTextField(name: "Categoría", variable: tipoController, multiline: true),
+
             
             Row(
               children: [
@@ -92,6 +95,7 @@ class _AddProductBottomSheetState extends State<AddProductBottomSheet> {
 
 
             CustomTextField(name: "Descripción", variable: descripcionController, multiline: true),
+
 
 
             Container(

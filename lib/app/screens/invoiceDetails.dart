@@ -133,7 +133,7 @@ class CotizacionDetallePage extends StatelessWidget {
               onTap: () => _pendingAlert(
                 context,
                 'Facturar cotización',
-                'Al presionar este botón se generará una factura CFDI (XML) a partir de los datos de esta cotización y del receptor. Funcionalidad pendiente.',
+                'Al presionar este botón se generará una factura CFDI a partir de los datos de esta cotización y del receptor. Funcionalidad pendiente.',
               ),
             ),
             const SizedBox(height: 12),
