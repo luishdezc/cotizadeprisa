@@ -1,4 +1,5 @@
-import 'package:cotizadeprisa/app/screens/login_process/login.dart';
+import 'package:cotizadeprisa/app/auth_gate.dart';
+import 'package:cotizadeprisa/app/services/auth_service.dart';
 import 'package:cotizadeprisa/app/screens/profileSettings.dart';
 import 'package:cotizadeprisa/app/widgets/Texts.dart';
 import 'package:cotizadeprisa/app/widgets/customButon.dart';
@@ -15,6 +16,7 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     bool isDarkMode = false;
+    final authService = AuthService();
 
     return Scaffold(
       appBar: AppBar(
@@ -155,11 +157,16 @@ class ProfileScreen extends StatelessWidget {
         
                   CustomButton(
                     texto: "Cerrar sesión",
-                    funcion: (){
-                      Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(builder: (context) => const LoginPage()),
-                      );
-                    }
+                    funcion: () async {
+                      await authService.signOut();
+                      if (context.mounted) {
+                        Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(
+                              builder: (_) => const AuthGate()),
+                          (_) => false,
+                        );
+                      }
+                    },
                   )
                 ],
               )

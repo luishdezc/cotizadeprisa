@@ -1,10 +1,11 @@
-
 import 'package:cotizadeprisa/app/screens/homePage.dart';
+import 'package:cotizadeprisa/app/screens/login_process/registro.dart';
+import 'package:cotizadeprisa/app/services/auth_service.dart';
+import 'package:cotizadeprisa/app/widgets/customButon.dart';
+import 'package:cotizadeprisa/app/widgets/customTextField.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:cotizadeprisa/app/screens/login_process/registro.dart';
-import 'package:cotizadeprisa/app/widgets/customTextField.dart';
-import 'package:cotizadeprisa/app/widgets/customButon.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class LoginPage extends StatefulWidget {
@@ -15,15 +16,71 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  // Controladores de los textfields
   final TextEditingController correoController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  final AuthService _authService = AuthService();
+
+  bool _isLoading = false;
 
   @override
   void dispose() {
     correoController.dispose();
     passwordController.dispose();
     super.dispose();
+  }
+
+  Future<void> _handleLogin() async {
+    final email = correoController.text.trim();
+    final password = passwordController.text;
+
+    if (email.isEmpty || password.isEmpty) {
+      _showError('Por favor completa todos los campos.');
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      await _authService.signInWithEmail(email: email, password: password);
+      if (!mounted) return;
+      Navigator.pushReplacement(
+        context,
+        CupertinoPageRoute(builder: (context) => const HomePage()),
+      );
+    } on FirebaseAuthException catch (e) {
+      _showError(AuthService.getErrorMessage(e));
+    } catch (_) {
+      _showError('Ocurrió un error inesperado. Intenta de nuevo.');
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  void _showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.redAccent,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
+  Future<void> _handleGoogleLogin() async {
+    setState(() => _isLoading = true);
+    try {
+      final result = await _authService.signInWithGoogle();
+      if (result == null) return; // Cancelado por el usuario
+      if (!mounted) return;
+      Navigator.pushReplacement(
+        context,
+        CupertinoPageRoute(builder: (context) => const HomePage()),
+      );
+    } catch (e) {
+      _showError('Error al iniciar con Google. Intenta de nuevo.');
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
   }
 
   @override
@@ -44,7 +101,9 @@ class _LoginPageState extends State<LoginPage> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
-                shadows: const [BoxShadow(color: Colors.black12, blurRadius: 10, offset: Offset(0, 4))],
+                shadows: const [
+                  BoxShadow(color: Colors.black12, blurRadius: 10, offset: Offset(0, 4))
+                ],
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -54,12 +113,11 @@ class _LoginPageState extends State<LoginPage> {
                     'Inicio de sesión',
                     style: TextStyle(
                       color: Colors.black,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 20),
-                  
+                  const SizedBox(height: 25),
 
                   CustomTextField(
                     name: "Correo electrónico",
@@ -68,21 +126,20 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   const SizedBox(height: 15),
 
-
                   CustomTextField(
                     name: "Contraseña",
                     variable: passwordController,
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 12),
 
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const Text(
                         '¿No tienes cuenta? ',
                         style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 12,
+                          color: Colors.black54,
+                          fontSize: 13,
                           fontWeight: FontWeight.w400,
                         ),
                       ),
@@ -97,25 +154,59 @@ class _LoginPageState extends State<LoginPage> {
                           'Registrarse',
                           style: TextStyle(
                             color: Color(0xFF008F8F),
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
                             decoration: TextDecoration.underline,
                           ),
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 25),
+                  const SizedBox(height: 30),
 
-                  CustomButton(
-                    texto: "Ingresar",
-                    funcion: () {
-                      Navigator.pushReplacement(
-                        context,
-                        CupertinoPageRoute(builder: (context) => const HomePage()),
-                      );
-                    },
-                  ),
+                  _isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : Column(
+                          children: [
+                            CustomButton(
+                              texto: "Ingresar",
+                              funcion: _handleLogin,
+                            ),
+                            const SizedBox(height: 16),
+
+                            const Row(
+                              children: [
+                                Expanded(child: Divider()),
+                                Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: 10),
+                                  child: Text("o", style: TextStyle(color: Colors.grey)),
+                                ),
+                                Expanded(child: Divider()),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
+
+                            OutlinedButton.icon(
+                              onPressed: _isLoading ? null : _handleGoogleLogin,
+                              icon: Image.network(
+                                'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRvUEPcQkCb9DNjiN5j_uL51VMehMlc6ye5AQ&s',
+                                height: 20,
+                                errorBuilder: (context, error, stackTrace) => const Icon(Icons.account_circle),
+                              ),
+                              label: const Text(
+                                'Continuar con Google',
+                                style: TextStyle(color: Colors.black87, fontWeight: FontWeight.w500),
+                              ),
+                              style: OutlinedButton.styleFrom(
+                                minimumSize: const Size(double.infinity, 50),
+                                side: const BorderSide(color: Colors.grey),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                 ],
               ),
             ),

@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "1021221934972",
+    "project_id": "proyecto-3bda9",
+    "storage_bucket": "proyecto-3bda9.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1021221934972:android:1608bdd4c9362d086db6f9",
+        "android_client_info": {
+          "package_name": "com.example.cotizadeprisa"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1021221934972-nrhm9a49fh6v3oj9jpmvqq1osscdas77.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.cotizadeprisa",
+            "certificate_hash": "158bf4a6c188defafb551404c335293372c0384e"
+          }
+        },
+        {
+          "client_id": "1021221934972-kc4o714qaasncl3ug9mqbch3m8l0csr4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAas2NB3mr9MVW7VCUwGvC-iDQLdaVeq8s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1021221934972-kc4o714qaasncl3ug9mqbch3m8l0csr4.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1021221934972-4h1nuncutrmlqq0rh68gsbjl7fbm2ofb.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.cotizadeprisa"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

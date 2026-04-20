@@ -1,8 +1,10 @@
-import 'package:cotizadeprisa/app/screens/login_process/codeConfirmation.dart';
+import 'package:cotizadeprisa/app/screens/intro_screens/introductionScreen.dart';
+import 'package:cotizadeprisa/app/services/auth_service.dart';
+import 'package:cotizadeprisa/app/widgets/customButon.dart';
+import 'package:cotizadeprisa/app/widgets/customTextField.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:cotizadeprisa/app/widgets/customTextField.dart';
-import 'package:cotizadeprisa/app/widgets/customButon.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class RegistroPage extends StatefulWidget {
@@ -13,10 +15,12 @@ class RegistroPage extends StatefulWidget {
 }
 
 class _RegistroPageState extends State<RegistroPage> {
-  // Controladores
   final TextEditingController nombreController = TextEditingController();
   final TextEditingController correoController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  final AuthService _authService = AuthService();
+
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -24,6 +28,53 @@ class _RegistroPageState extends State<RegistroPage> {
     correoController.dispose();
     passwordController.dispose();
     super.dispose();
+  }
+
+  Future<void> _handleRegistro() async {
+    final nombre = nombreController.text.trim();
+    final email = correoController.text.trim();
+    final password = passwordController.text;
+
+    if (nombre.isEmpty || email.isEmpty || password.isEmpty) {
+      _showError('Por favor completa todos los campos.');
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      final credential = await _authService.registerWithEmail(
+        email: email,
+        password: password,
+      );
+
+      await credential.user?.updateDisplayName(nombre);
+
+      if (!mounted) return;
+
+      // Tras registrarse exitosamente → flujo de onboarding
+      Navigator.pushReplacement(
+        context,
+        CupertinoPageRoute(
+            builder: (context) => const IntroductionScreen()),
+      );
+    } on FirebaseAuthException catch (e) {
+      _showError(AuthService.getErrorMessage(e));
+    } catch (_) {
+      _showError('Ocurrió un error inesperado. Intenta de nuevo.');
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  void _showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.redAccent,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
   }
 
   @override
@@ -44,7 +95,9 @@ class _RegistroPageState extends State<RegistroPage> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
-                shadows: const [BoxShadow(color: Colors.black12, blurRadius: 10, offset: Offset(0, 4))],
+                shadows: const [
+                  BoxShadow(color: Colors.black12, blurRadius: 10, offset: Offset(0, 4))
+                ],
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -58,7 +111,7 @@ class _RegistroPageState extends State<RegistroPage> {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  
+
                   CustomTextField(
                     name: "Nombre completo",
                     variable: nombreController,
@@ -88,7 +141,6 @@ class _RegistroPageState extends State<RegistroPage> {
                       ),
                       GestureDetector(
                         onTap: () {
-                          // Regresar al Login
                           Navigator.pop(context);
                         },
                         child: const Text(
@@ -104,16 +156,12 @@ class _RegistroPageState extends State<RegistroPage> {
                   ),
                   const SizedBox(height: 25),
 
-                  CustomButton(
-                    texto: "Registrarse",
-                    funcion: () {
-                      
-                      Navigator.push(
-                        context,
-                        CupertinoPageRoute(builder: (context) => const ConfirmacionPage()),
-                      );
-                    },
-                  ),
+                  _isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : CustomButton(
+                          texto: "Registrarse",
+                          funcion: _handleRegistro,
+                        ),
                 ],
               ),
             ),
