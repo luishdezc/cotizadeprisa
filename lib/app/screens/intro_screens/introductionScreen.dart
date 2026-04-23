@@ -2,10 +2,12 @@ import 'package:cotizadeprisa/app/screens/intro_screens/intoPage_1.dart';
 import 'package:cotizadeprisa/app/screens/intro_screens/introPage_2.dart';
 import 'package:cotizadeprisa/app/screens/intro_screens/introPage_3.dart';
 import 'package:cotizadeprisa/app/screens/intro_screens/introPage_4.dart';
-import 'package:cotizadeprisa/app/screens/login_process/registro.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import 'package:cotizadeprisa/app/screens/homePage.dart';
+import 'package:cotizadeprisa/app/screens/intro_screens/introPage_5.dart';
+
 
 class IntroductionScreen extends StatefulWidget {
   const IntroductionScreen({super.key});
@@ -55,12 +57,18 @@ class _IntroductionScreenState extends State<IntroductionScreen> {
                 direccionController: direccionController,
                 rfcController: rfcController,
               ),
+              IntroPage5(
+                next: () => _controller.nextPage(
+                    duration: const Duration(milliseconds: 450),
+                    curve: Curves.easeOutSine),
+              ),
               IntroPage4(
                 next: () {
-                  Navigator.of(context).pushReplacement(
+                  Navigator.of(context).pushAndRemoveUntil(
                     CupertinoPageRoute(
-                      builder: (context) => const RegistroPage(),
+                      builder: (context) => const HomePage(),
                     ),
+                    (_) => false,
                   );
                 },
               ),
