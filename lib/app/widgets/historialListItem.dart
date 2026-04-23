@@ -5,7 +5,7 @@ class HistorialListItem extends StatelessWidget {
   final Cotizacion cot;
   final VoidCallback onTap;
 
-  const HistorialListItem({required this.cot, required this.onTap});
+  const HistorialListItem({super.key, required this.cot, required this.onTap});
 
   @override
   Widget build(BuildContext context) {

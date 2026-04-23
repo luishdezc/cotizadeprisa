@@ -127,12 +127,10 @@ class _ProductState extends State<Product> {
       ],
       buttonBuilder: (context, showMenu) => GestureDetector(
         onTap: (){
-
           showMenu();
         },
         child: Container(
-          color: Colors.white,
-         
+          color: Colors.transparent,
           child: SizedBox(
             height: 28,
             child: Icon(
@@ -168,7 +166,6 @@ Widget _buildPriceAndQuantity(BuildContext context) {
                 ),
               SizedBox(
                 width: 145,
-                //margin: EdgeInsets.only(left: 10),
                 child: Text(
                   NumberFormat('#,##0.00').format(widget.total),
                   textAlign: TextAlign.end,

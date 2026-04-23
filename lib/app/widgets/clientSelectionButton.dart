@@ -9,7 +9,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class ClientSelectionButton extends StatefulWidget {
 
-  ClientSelectionButton({
+  const ClientSelectionButton({
     super.key,
     this.image,
     required this.name,

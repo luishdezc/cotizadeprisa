@@ -52,11 +52,9 @@ class _RegistroPageState extends State<RegistroPage> {
 
       if (!mounted) return;
 
-      // Tras registrarse exitosamente → flujo de onboarding
       Navigator.pushReplacement(
         context,
-        CupertinoPageRoute(
-            builder: (context) => const IntroductionScreen()),
+        CupertinoPageRoute(builder: (context) => const IntroductionScreen()),
       );
     } on FirebaseAuthException catch (e) {
       _showError(AuthService.getErrorMessage(e));
@@ -79,8 +77,10 @@ class _RegistroPageState extends State<RegistroPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 245, 245, 245),
+      backgroundColor: isDark ? const Color(0xFF121212) : const Color.fromARGB(255, 245, 245, 245),
       body: Center(
         child: SingleChildScrollView(
           child: Padding(
@@ -91,12 +91,12 @@ class _RegistroPageState extends State<RegistroPage> {
               padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 40),
               clipBehavior: Clip.antiAlias,
               decoration: ShapeDecoration(
-                color: Colors.white,
+                color: Theme.of(context).cardColor,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
-                shadows: const [
-                  BoxShadow(color: Colors.black12, blurRadius: 10, offset: Offset(0, 4))
+                shadows: [
+                  BoxShadow(color: Theme.of(context).shadowColor.withAlpha(30), blurRadius: 10, offset: const Offset(0, 4))
                 ],
               ),
               child: Column(

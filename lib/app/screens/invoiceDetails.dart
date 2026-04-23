@@ -7,7 +7,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 class CotizacionDetallePage extends StatelessWidget {
   final Cotizacion cot;
 
-  const CotizacionDetallePage({required this.cot});
+  const CotizacionDetallePage({super.key, required this.cot});
 
   void _pendingAlert(BuildContext context, String titulo, String mensaje) {
     showCupertinoDialog(

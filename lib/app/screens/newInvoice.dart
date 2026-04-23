@@ -278,6 +278,7 @@ class _ProductSectionState extends State<ProductSection> {
 
   @override
   Widget build(BuildContext context) {
+    final textColor = Theme.of(context).textTheme.bodyLarge?.color;
     return CustomCard(
       child: Column(
         children: [
@@ -319,19 +320,19 @@ class _ProductSectionState extends State<ProductSection> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           RichText(
-                            text: const TextSpan(
+                            text: TextSpan(
                               children: [
                                 TextSpan(
                                   text: 'Total ',
-                                  style: TextStyle(color: Colors.black, fontSize: 17),
+                                  style: TextStyle(color: textColor, fontSize: 17),
                                 ),
-                                TextSpan(
+                                const TextSpan(
                                   text: '(sin impuesto) ',
                                   style: TextStyle(color: Colors.grey, fontSize: 17),
                                 ),
                                 TextSpan(
                                   text: ':',
-                                  style: TextStyle(color: Colors.black, fontSize: 17),
+                                  style: TextStyle(color: textColor, fontSize: 17),
                                 ),
                               ],
                             ),

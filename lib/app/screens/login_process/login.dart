@@ -70,7 +70,7 @@ class _LoginPageState extends State<LoginPage> {
     setState(() => _isLoading = true);
     try {
       final result = await _authService.signInWithGoogle();
-      if (result == null) return; // Cancelado por el usuario
+      if (result == null) return;
       if (!mounted) return;
       Navigator.pushReplacement(
         context,
@@ -85,8 +85,10 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 245, 245, 245),
+      backgroundColor: isDark ? const Color(0xFF121212) : const Color.fromARGB(255, 245, 245, 245),
       body: Center(
         child: SingleChildScrollView(
           child: Padding(
@@ -97,22 +99,21 @@ class _LoginPageState extends State<LoginPage> {
               padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 40),
               clipBehavior: Clip.antiAlias,
               decoration: ShapeDecoration(
-                color: Colors.white,
+                color: Theme.of(context).cardColor,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
-                shadows: const [
-                  BoxShadow(color: Colors.black12, blurRadius: 10, offset: Offset(0, 4))
+                shadows: [
+                  BoxShadow(color: Theme.of(context).shadowColor.withAlpha(30), blurRadius: 10, offset: const Offset(0, 4))
                 ],
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'Inicio de sesión',
                     style: TextStyle(
-                      color: Colors.black,
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                     ),
@@ -135,10 +136,10 @@ class _LoginPageState extends State<LoginPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text(
+                      Text(
                         '¿No tienes cuenta? ',
                         style: TextStyle(
-                          color: Colors.black54,
+                          color: isDark ? Colors.white54 : Colors.black54,
                           fontSize: 13,
                           fontWeight: FontWeight.w400,
                         ),
@@ -193,13 +194,13 @@ class _LoginPageState extends State<LoginPage> {
                                 height: 20,
                                 errorBuilder: (context, error, stackTrace) => const Icon(Icons.account_circle),
                               ),
-                              label: const Text(
+                              label: Text(
                                 'Continuar con Google',
-                                style: TextStyle(color: Colors.black87, fontWeight: FontWeight.w500),
+                                style: TextStyle(color: isDark ? Colors.white70 : Colors.black87, fontWeight: FontWeight.w500),
                               ),
                               style: OutlinedButton.styleFrom(
                                 minimumSize: const Size(double.infinity, 50),
-                                side: const BorderSide(color: Colors.grey),
+                                side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8),
                                 ),

@@ -14,10 +14,10 @@ class CustomCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
 
-      decoration:  BoxDecoration(
-        color: Colors.white,
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(9),
-        boxShadow: const [BoxShadow(color: Color.fromARGB(37, 65, 65, 65), offset: Offset(0, 1), blurRadius: 5),],
+        boxShadow: [BoxShadow(color: Theme.of(context).shadowColor.withAlpha(37), offset: const Offset(0, 1), blurRadius: 5)],
       ),
 
 

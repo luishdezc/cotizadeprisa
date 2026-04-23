@@ -1,5 +1,4 @@
 import 'package:cotizadeprisa/app/widgets/Texts.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:cotizadeprisa/app/widgets/customCard.dart';
@@ -28,50 +27,44 @@ class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        title: const TitleText(text: 'Actualizar Datos',),
+        title: const TitleText(text: 'Actualizar Datos'),
       ),
 
-
       floatingActionButton: FloatingActionButton(
-        onPressed: ()  {
-        },
+        onPressed: () {},
         backgroundColor: const Color.fromARGB(255, 253, 170, 41),
         child: const Icon(LucideIcons.save, color: Colors.white),
       ),
 
       body: SingleChildScrollView(
-              child: Container(
-                constraints: BoxConstraints(
-                  minHeight: MediaQuery.of(context).size.height,
+        child: Container(
+          constraints: BoxConstraints(
+            minHeight: MediaQuery.of(context).size.height,
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Column(
+              children: [
+                const SizedBox(height: 20),
+                DatosDeEmpresaSection(
+                  nombre: nombre,
+                  slogan: slogan,
+                  correo: correo,
+                  telefono: telefono,
+                  usuario: usuario,
+                  direccion: direccion,
+                  rfc: rfc,
                 ),
-                
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Column(
-                    children: [
-                      
-                      const SizedBox(height: 20),
-                      DatosDeEmpresaSection(
-                        nombre: nombre,
-                        slogan: slogan,
-                        correo: correo,
-                        telefono: telefono,
-                        usuario: usuario,
-                        direccion: direccion,
-                        rfc: rfc,
-                      ),
-                      const SizedBox(height: 20),
-                      DatosDePagoSection(impuesto: impuesto),
-                    ],
-                  ),
-                ),
-              ),
+                const SizedBox(height: 20),
+                DatosDePagoSection(impuesto: impuesto),
+              ],
             ),
+          ),
+        ),
+      ),
     );
   }
 }
-
-
 
 class DatosDeEmpresaSection extends StatelessWidget {
   final TextEditingController nombre;
@@ -99,10 +92,9 @@ class DatosDeEmpresaSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Datos de la empresa',
             style: TextStyle(
-              color: Color.fromARGB(255, 53, 53, 53),
               fontSize: 20,
               fontWeight: FontWeight.w700,
             ),
@@ -115,7 +107,6 @@ class DatosDeEmpresaSection extends StatelessWidget {
             separatorBuilder: (_, __) => const SizedBox(height: 25),
             itemBuilder: (context, index) => listOfForm(nombre, slogan, correo, telefono, usuario, direccion, rfc)[index],
           ),
-
           const LogoButton(),
         ],
       ),
@@ -137,10 +128,9 @@ class DatosDePagoSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Datos del pago',
             style: TextStyle(
-              color: Color.fromARGB(255, 53, 53, 53),
               fontSize: 20,
               fontWeight: FontWeight.w700,
             ),
@@ -169,50 +159,18 @@ List<CustomTextField> listOfForm(
   TextEditingController rfc,
 ) {
   return [
-    CustomTextField(
-      icon: LucideIcons.building,
-      name: "Nombre de la empresa",
-      variable: nombre,
-    ),
-    CustomTextField(
-      icon: LucideIcons.signature,
-      name: "Slogan",
-      variable: slogan,
-    ),
-    CustomTextField(
-      icon: LucideIcons.mail,
-      name: "Correo",
-      variable: correo,
-    ),
-    CustomTextField(
-      icon: LucideIcons.phone,
-      name: "Teléfono",
-      variable: telefono,
-    ),
-    CustomTextField(
-      icon: LucideIcons.user,
-      name: "Nombre Completo",
-      variable: usuario,
-    ),
-    CustomTextField(
-      icon: LucideIcons.mapPin,
-      name: "Direccion",
-      variable: direccion,
-    ),
-    CustomTextField(
-      icon: LucideIcons.idCardLanyard,
-      name: "RFC",
-      variable: rfc,
-    ),
+    CustomTextField(icon: LucideIcons.building, name: "Nombre de la empresa", variable: nombre),
+    CustomTextField(icon: LucideIcons.signature, name: "Slogan", variable: slogan),
+    CustomTextField(icon: LucideIcons.mail, name: "Correo", variable: correo),
+    CustomTextField(icon: LucideIcons.phone, name: "Teléfono", variable: telefono),
+    CustomTextField(icon: LucideIcons.user, name: "Nombre Completo", variable: usuario),
+    CustomTextField(icon: LucideIcons.mapPin, name: "Direccion", variable: direccion),
+    CustomTextField(icon: LucideIcons.idCardLanyard, name: "RFC", variable: rfc),
   ];
 }
 
 List<CustomTextField> listOfPriceForm(TextEditingController impuesto) {
   return [
-    CustomTextField(
-      icon: LucideIcons.percent,
-      name: "Porcentaje de impuesto",
-      variable: impuesto,
-    ),
+    CustomTextField(icon: LucideIcons.percent, name: "Porcentaje de impuesto", variable: impuesto),
   ];
 }

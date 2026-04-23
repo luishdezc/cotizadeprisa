@@ -40,10 +40,9 @@ class _SatPageState extends State<SatPage> {
         backgroundColor: Colors.transparent,
         scrolledUnderElevation: 0,
         automaticallyImplyLeading: false,
-        title: const Text(
+        title: Text(
           'SAT',
           style: TextStyle(
-            color: Colors.black,
             fontSize: 20,
             fontFamily: 'Inter',
             fontWeight: FontWeight.w600,
@@ -124,13 +123,13 @@ class _SatPageState extends State<SatPage> {
               ),
               const SizedBox(height: 20),
 
-              const Text(
+              Text(
                 'Declaraciones',
                 style: TextStyle(
                     fontSize: 16,
                     fontFamily: 'Inter',
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF3C3C3C)),
+                    color: Theme.of(context).hintColor),
               ),
               const SizedBox(height: 10),
 
@@ -229,10 +228,10 @@ class _QuickAction extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 14),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: Theme.of(context).cardColor,
             borderRadius: BorderRadius.circular(10),
-            boxShadow: const [
-              BoxShadow(color: Color.fromARGB(25, 0, 0, 0), blurRadius: 6, offset: Offset(0, 2)),
+            boxShadow: [
+              BoxShadow(color: Theme.of(context).shadowColor.withAlpha(25), blurRadius: 6, offset: const Offset(0, 2)),
             ],
           ),
           child: Column(
@@ -242,11 +241,11 @@ class _QuickAction extends StatelessWidget {
               Text(
                 label,
                 textAlign: TextAlign.center,
-                style: const TextStyle(
+                style: TextStyle(
                     fontSize: 11,
                     fontFamily: 'Inter',
                     fontWeight: FontWeight.w500,
-                    color: Color(0xFF3C3C3C)),
+                    color: Theme.of(context).hintColor),
               ),
             ],
           ),

@@ -5,13 +5,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-
-
-//Poder ver estatus de la cotizacion (facturacion o timbrado, aceptado por cliente, rechazado, pendiente)
-
-
-
-
 const _mockActivas = [
   Cotizacion(
     id: 'COT-001',
@@ -124,6 +117,9 @@ class _HistorialPageState extends State<HistorialPage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final searchBg = isDark ? const Color(0xFF2A2A2A) : const Color(0xFFEFEFEF);
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -145,7 +141,7 @@ class _HistorialPageState extends State<HistorialPage> {
                     child: Container(
                       height: 40,
                       decoration: ShapeDecoration(
-                        color: const Color(0xFFEFEFEF),
+                        color: searchBg,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
                       ),
                       child: TextField(

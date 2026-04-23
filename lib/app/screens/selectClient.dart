@@ -1,4 +1,3 @@
-
 import 'package:cotizadeprisa/app/widgets/Texts.dart';
 import 'package:cotizadeprisa/app/widgets/searchBar.dart';
 import 'package:cotizadeprisa/app/models/cliente.dart';
@@ -10,14 +9,11 @@ import 'package:cotizadeprisa/app/widgets/customButon.dart';
 class SelectClientePage extends StatefulWidget {
   final String title;
   final List<Widget> filters;
-  //final String dataSource; para saber en donde consultar
 
   const SelectClientePage({
     super.key,
     required this.title,
     required this.filters,
-    
-    //required this.dataSource,
   });
 
   @override
@@ -49,7 +45,6 @@ class _SelectClientePageState extends State<SelectClientePage> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -90,7 +85,6 @@ class _SelectClientePageState extends State<SelectClientePage> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -127,7 +121,7 @@ class _SelectClientePageState extends State<SelectClientePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: TitleText(text: widget.title)
+        title: TitleText(text: widget.title),
       ),
       body: SafeArea(
         child: Padding(
@@ -135,7 +129,6 @@ class _SelectClientePageState extends State<SelectClientePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // SEARCH BAR Y FILTRO
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -143,14 +136,12 @@ class _SelectClientePageState extends State<SelectClientePage> {
                   const SizedBox(width: 20),
                   GestureDetector(
                     onTap: () => _showNewClientModal(context),
-                    child: const Icon(LucideIcons.userPlus, color: Colors.black, size: 26),
+                    child: Icon(LucideIcons.userPlus, size: 26),
                   ),
                 ],
               ),
               const SizedBox(height: 20),
 
-
-              // LISTA
               Expanded(
                 child: ListView.separated(
                   itemCount: mockData.length,
@@ -177,9 +168,9 @@ class _SelectClientePageState extends State<SelectClientePage> {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content: Text('Se seleccionó un cliente proximamente'),
-                          )
+                          ),
                         );
-                      }, 
+                      },
                       onIconClick: () {
                         _showEditClientModal(context, item);
                       },
@@ -195,15 +186,11 @@ class _SelectClientePageState extends State<SelectClientePage> {
   }
 }
 
-
-
-
-
 class ClientListItem extends StatelessWidget {
   final String titulo;
   final String rfc;
-  final VoidCallback onClick; 
-  final VoidCallback onIconClick; 
+  final VoidCallback onClick;
+  final VoidCallback onIconClick;
 
   const ClientListItem({
     super.key,
@@ -216,7 +203,7 @@ class ClientListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onClick, 
+      onTap: onClick,
       child: Container(
         width: double.infinity,
         height: 65,
@@ -232,7 +219,7 @@ class ClientListItem extends StatelessWidget {
                   width: 46,
                   height: double.infinity,
                   decoration: ShapeDecoration(
-                    color: const Color(0xFFA5D9D9), // PrimaryLight
+                    color: const Color(0xFFA5D9D9),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(6),
                     ),
@@ -240,7 +227,7 @@ class ClientListItem extends StatelessWidget {
                   child: const Center(
                     child: Text(
                       "AB",
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: Colors.white,
                         fontSize: 16,
                         fontFamily: 'Inter',
@@ -256,8 +243,7 @@ class ClientListItem extends StatelessWidget {
                   children: [
                     Text(
                       titulo,
-                      style: const TextStyle(
-                        color: Colors.black,
+                      style: TextStyle(
                         fontSize: 15,
                         fontFamily: 'Inter',
                         fontWeight: FontWeight.w500,
@@ -266,8 +252,7 @@ class ClientListItem extends StatelessWidget {
                     const SizedBox(height: 3),
                     Text(
                       rfc,
-                      style: const TextStyle(
-                        color: Colors.black,
+                      style: TextStyle(
                         fontSize: 12,
                         fontFamily: 'Inter',
                         fontWeight: FontWeight.w400,
@@ -277,22 +262,19 @@ class ClientListItem extends StatelessWidget {
                 ),
               ],
             ),
-            
-            
+
             GestureDetector(
               onTap: onIconClick,
-            
               child: Container(
-                color: Colors.transparent, 
+                color: Colors.transparent,
                 padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
                 child: const Icon(
-                  LucideIcons.ellipsisVertical, 
-                  size: 18, 
-                  color: Color(0xFF919191)
+                  LucideIcons.ellipsisVertical,
+                  size: 18,
+                  color: Color(0xFF919191),
                 ),
               ),
             ),
-            
           ],
         ),
       ),
