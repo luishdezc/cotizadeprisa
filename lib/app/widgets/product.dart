@@ -13,30 +13,33 @@ class Product extends StatefulWidget {
     required this.nombre,
     required this.precioIndividual,
     required this.cantidadInicial,
-    required this.imagesPath,
     required this.descuento,
     required this.descripcion,
+    this.onDelete,
+    this.onUpdated,
   });
-
 
   String nombre;
   String precioIndividual;
   String cantidadInicial;
   String descripcion;
   String descuento;
-  List<String> imagesPath;
 
+  VoidCallback? onDelete;
+  ValueChanged<Product>? onUpdated;
 
   double get totalwithDiscount =>
-      ((int.tryParse(cantidadInicial) ?? 0) * double.parse(precioIndividual)) * ((100 - (double.tryParse(descuento) ?? 0)) / 100);
-  
+      ((int.tryParse(cantidadInicial) ?? 0) *
+          (double.tryParse(precioIndividual) ?? 0)) *
+      ((100 - (double.tryParse(descuento) ?? 0)) / 100);
+
   double get total =>
-      (int.tryParse(cantidadInicial) ?? 0) * double.parse(precioIndividual);
+      (int.tryParse(cantidadInicial) ?? 0) *
+      (double.tryParse(precioIndividual) ?? 0);
 
   @override
   State<Product> createState() => _ProductState();
 }
-
 
 class _ProductState extends State<Product> {
   late TextEditingController cantidadController;
@@ -47,191 +50,174 @@ class _ProductState extends State<Product> {
     cantidadController = TextEditingController(text: widget.cantidadInicial);
   }
 
-
+  @override
+  void dispose() {
+    cantidadController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return IntrinsicHeight(
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 9),
-        child: Row(
-          children: [
-            _buildImage(),
-            _buildProductDetails(context),
-          ],
-        ),
+        child: _buildProductDetails(context),
       ),
     );
   }
-
-  Widget _buildImage() {
-    return const Expanded(
-      flex: 3,
-      child: Padding(
-        padding:  EdgeInsets.only(right: 12),
-        child: Center(child: Icon(LucideIcons.image)),
-      ),
-    );
-  }
-
-
 
   Widget _buildProductDetails(BuildContext context) {
-    return Expanded(
-      flex: 8,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  widget.nombre,
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 2,
-                  softWrap: true,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Theme.of(context).hintColor,
-                    height: 1,
-                  ),
-                ),
-              ),
-      
-              buildPullDownButton(),
-
-            ],
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Row(children: [
+          Expanded(
+            child: Text(
+              widget.nombre,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 2,
+              softWrap: true,
+              style: TextStyle(
+                  fontSize: 14, color: Theme.of(context).hintColor, height: 1),
+            ),
           ),
-          const SizedBox(height: 10),
-          _buildPriceAndQuantity(context),
-        ],
-      ),
+          _buildMenu(),
+        ]),
+        const SizedBox(height: 10),
+        _buildPriceRow(context),
+      ],
     );
   }
 
-  PullDownButton buildPullDownButton() {
+  Widget _buildMenu() {
     return PullDownButton(
       itemBuilder: (context) => [
         PullDownMenuItem.selectable(
           onTap: () async {
-            showProductBottomSheet(context, isEditing: true,);
+            final updated = await showProductBottomSheet(
+              context,
+              isEditing: true,
+              existing: widget,
+            );
+            if (updated != null) {
+              setState(() {
+                widget.nombre           = updated.nombre;
+                widget.precioIndividual = updated.precioIndividual;
+                widget.cantidadInicial  = updated.cantidadInicial;
+                widget.descuento        = updated.descuento;
+                widget.descripcion      = updated.descripcion;
+                cantidadController.text = updated.cantidadInicial;
+              });
+              widget.onUpdated?.call(widget);
+            }
           },
           title: 'Editar',
           icon: LucideIcons.pen,
         ),
         PullDownMenuItem.selectable(
-          onTap: () {},
+          onTap: () => widget.onDelete?.call(),
           title: 'Eliminar',
           icon: LucideIcons.trash2,
+          isDestructive: true,
         ),
       ],
       buttonBuilder: (context, showMenu) => GestureDetector(
-        onTap: (){
-          showMenu();
-        },
+        onTap: showMenu,
         child: Container(
           color: Colors.transparent,
           child: SizedBox(
             height: 28,
-            child: Icon(
-              LucideIcons.ellipsisVertical,
-              color: Theme.of(context).hintColor,
-              size: 20,
-            ),
+            child: Icon(LucideIcons.ellipsisVertical,
+                color: Theme.of(context).hintColor, size: 20),
           ),
         ),
       ),
     );
   }
 
-
-Widget _buildPriceAndQuantity(BuildContext context) {
-
+  Widget _buildPriceRow(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(right: 8.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ( widget.descuento != "0" )
-          ? Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              SizedBox(
-                width: 70,
+          if (widget.descuento != '0')
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                SizedBox(
+                  width: 100,
                   child: Text(
-                      NumberFormat('#,##0.00').format(double.parse(widget.precioIndividual)),
-                      style: TextStyle(fontSize: 11, color: Theme.of(context).shadowColor),
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                    NumberFormat('#,##0.00').format(
+                        double.tryParse(widget.precioIndividual) ?? 0),
+                    style: TextStyle(
+                        fontSize: 11,
+                        color: Theme.of(context).shadowColor),
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
-              SizedBox(
-                width: 145,
-                child: Text(
-                  NumberFormat('#,##0.00').format(widget.total),
-                  textAlign: TextAlign.end,
-                  style: TextStyle(fontSize: 11, color: Theme.of(context).shadowColor, decoration: TextDecoration.lineThrough),
-                  overflow: TextOverflow.ellipsis,
+                SizedBox(
+                  width: 145,
+                  child: Text(
+                    NumberFormat('#,##0.00').format(widget.total),
+                    textAlign: TextAlign.end,
+                    style: TextStyle(
+                        fontSize: 11,
+                        color: Theme.of(context).shadowColor,
+                        decoration: TextDecoration.lineThrough),
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
-              ),
-                ],
-              )
-      
-          : Text(
-              NumberFormat('#,##0.00').format(double.parse(widget.precioIndividual)),
-              style: TextStyle(fontSize: 11, color: Theme.of(context).shadowColor),
+              ],
+            )
+          else
+            Text(
+              NumberFormat('#,##0.00')
+                  .format(double.tryParse(widget.precioIndividual) ?? 0),
+              style: TextStyle(
+                  fontSize: 11, color: Theme.of(context).shadowColor),
               overflow: TextOverflow.ellipsis,
             ),
-
-
-
           const SizedBox(height: 3),
-
-
-
-          Row(
-
-            children: [
-
-              //cantidad
-              
-              Container(
-                height: 35,
-                width: 71,
-                margin: const  EdgeInsets.only(right: 10),
-                    
-                child: TextField(
-                  controller: cantidadController,
-                  keyboardType: TextInputType.number,
-                  inputFormatters: <TextInputFormatter>[FilteringTextInputFormatter.digitsOnly],
-                  maxLengthEnforcement: MaxLengthEnforcement.enforced,
-                  onChanged: (value) {
-                    //actualizar total del widget
-                  },
-                  style: TextStyle(fontSize: 12, color: Theme.of(context).hintColor, height: 1,),
-                  decoration: InputDecoration(
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 9,vertical: 0),
-                    enabledBorder: borderDesginQty(context),
-                    focusedBorder: borderDesginQty(context),
-                  ),
-                ),    
-              ),
-
-              //Total del producto
-              Expanded(
-                child: Text(
-                  textAlign: TextAlign.end,
-                  "\$${NumberFormat('#,##0.00').format(widget.totalwithDiscount)}",
-                  
-                  overflow: TextOverflow.ellipsis, 
-                  style: TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.bold,
+          Row(children: [
+            Container(
+              height: 35,
+              width: 71,
+              margin: const EdgeInsets.only(right: 10),
+              child: TextField(
+                controller: cantidadController,
+                keyboardType: TextInputType.number,
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                onChanged: (value) {
+                  setState(() {
+                    widget.cantidadInicial = value.isEmpty ? '0' : value;
+                  });
+                  widget.onUpdated?.call(widget);
+                },
+                style: TextStyle(
+                    fontSize: 12,
                     color: Theme.of(context).hintColor,
-                  ),
+                    height: 1),
+                decoration: InputDecoration(
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 9, vertical: 0),
+                  enabledBorder: borderDesginQty(context),
+                  focusedBorder: borderDesginQty(context),
                 ),
               ),
-            ],
-          ),
+            ),
+            Expanded(
+              child: Text(
+                '\$${NumberFormat('#,##0.00').format(widget.totalwithDiscount)}',
+                textAlign: TextAlign.end,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                    fontSize: 17,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).hintColor),
+              ),
+            ),
+          ]),
         ],
       ),
     );

@@ -1,138 +1,138 @@
-
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:cotizadeprisa/app/widgets/customButon.dart';
 import 'package:cotizadeprisa/app/widgets/customTextField.dart';
+import 'package:cotizadeprisa/app/widgets/product.dart';
+import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-void showProductBottomSheet(BuildContext context, {bool isEditing = false}) {
-  showModalBottomSheet(
+
+Future<Product?> showProductBottomSheet(
+  BuildContext context, {
+  bool isEditing = false,
+  Product? existing,
+}) async {
+  final nombreCtrl =
+      TextEditingController(text: existing?.nombre ?? '');
+  final precioCtrl =
+      TextEditingController(text: existing?.precioIndividual ?? '');
+  final cantidadCtrl =
+      TextEditingController(text: existing?.cantidadInicial ?? '1');
+  final descuentoCtrl =
+      TextEditingController(text: existing?.descuento ?? '0');
+  final descripcionCtrl =
+      TextEditingController(text: existing?.descripcion ?? '');
+
+  return showModalBottomSheet<Product>(
     context: context,
     isScrollControlled: true,
-    builder: (_) => AddProductBottomSheet(isEditing: isEditing),
-  );
-}
-
-class AddProductBottomSheet extends StatefulWidget {
-  final bool isEditing;
-  const AddProductBottomSheet({super.key, this.isEditing = false});
-
-  @override
-  State<AddProductBottomSheet> createState() => _AddProductBottomSheetState();
-}
-
-class _AddProductBottomSheetState extends State<AddProductBottomSheet> {
-  final ImagePicker picker = ImagePicker();
-  
-
-  final TextEditingController nombreController = TextEditingController();
-  final TextEditingController tipoController = TextEditingController();
-  final TextEditingController precioController = TextEditingController();
-  final TextEditingController cantidadController = TextEditingController();
-  final TextEditingController descuentoController = TextEditingController();
-  final TextEditingController descripcionController = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-    if (!widget.isEditing) {
-      precioController.text = "1";
-      cantidadController.text = "1";
-    }
-  }
-
-  Future<void> _pickImage(ImageSource source) async {
-    await picker.pickImage(source: source);
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Imagen seleccionada (lógica pendiente)')),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(vertical: 15),
-      child: Container(
-        margin: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-        padding: const EdgeInsets.all(30),
-        decoration: BoxDecoration(
-          color: Theme.of(context).scaffoldBackgroundColor,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    ),
+    builder: (ctx) {
+      return Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(ctx).viewInsets.bottom,
+          left: 20,
+          right: 20,
+          top: 20,
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          spacing: 20,
-          children: [
-            Text(
-              widget.isEditing ? "Editar producto" : "Nuevo producto",
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-
-            
-            CustomTextField(name: "Nombre del producto", variable: nombreController, multiline: true),
-
-            CustomTextField(name: "Categoría", variable: tipoController, multiline: true),
-
-            
-            Row(
-              children: [
-                Expanded(
-                  flex: 2,
-                  child: CustomTextField(name: "Precio individual", variable: precioController, onlyDouble: true, isRequired: true),
-                ),
-                const SizedBox(width: 20),
-                Expanded(
-                  flex: 1,
-                  child: CustomTextField(name: "Cantidad", variable: cantidadController, onlyNumbers: true, isRequired: true),
-                ),
-              ],
-            ),
-
-
-            CustomTextField(name: "Descuento", variable: descuentoController, onlyNumbers: true, icon: LucideIcons.percent),
-
-
-            CustomTextField(name: "Descripción", variable: descripcionController, multiline: true),
-
-
-
-            Container(
-              decoration: BoxDecoration(
-                border: Border.all(width: 1.7, color: Theme.of(context).shadowColor),
-                borderRadius: BorderRadius.circular(10),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                isEditing ? 'Editar producto' : 'Nuevo producto',
+                style: const TextStyle(
+                    fontSize: 20, fontWeight: FontWeight.bold),
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              const SizedBox(height: 20),
+              CustomTextField(
+                name: 'Nombre del producto *',
+                variable: nombreCtrl,
+                icon: LucideIcons.tag,
+              ),
+              const SizedBox(height: 15),
+              CustomTextField(
+                name: 'Descripción',
+                variable: descripcionCtrl,
+                icon: LucideIcons.fileText,
+                multiline: true,
+              ),
+              const SizedBox(height: 15),
+              Row(
                 children: [
                   Expanded(
-                    child: CupertinoButton(
-                      padding: const EdgeInsets.all(7),
-                      onPressed: () => _pickImage(ImageSource.camera),
-                      child: Icon(LucideIcons.camera, color: Theme.of(context).hintColor, size: 24),
+                    child: CustomTextField(
+                      name: 'Precio unitario *',
+                      variable: precioCtrl,
+                      icon: LucideIcons.dollarSign,
+                      isNumeric: true,
                     ),
                   ),
-                  Container(height: 30, width: 1.5, color: Colors.grey),
+                  const SizedBox(width: 12),
                   Expanded(
-                    child: CupertinoButton(
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      onPressed: () => _pickImage(ImageSource.gallery),
-                      child: Icon(LucideIcons.imagePlus, color: Theme.of(context).hintColor, size: 24),
+                    child: CustomTextField(
+                      name: 'Cantidad *',
+                      variable: cantidadCtrl,
+                      icon: LucideIcons.hash,
+                      isNumeric: true,
                     ),
                   ),
                 ],
               ),
-            ),
+              const SizedBox(height: 15),
+              CustomTextField(
+                name: 'Descuento (%)',
+                variable: descuentoCtrl,
+                icon: LucideIcons.percent,
+                isNumeric: true,
+              ),
+              const SizedBox(height: 25),
+              CustomButton(
+                texto: isEditing ? 'Guardar cambios' : 'Agregar producto',
+                funcion: () {
+                  if (nombreCtrl.text.trim().isEmpty ||
+                      precioCtrl.text.trim().isEmpty) {
+                    ScaffoldMessenger.of(ctx).showSnackBar(
+                      const SnackBar(
+                          content: Text(
+                              'Nombre y precio son requeridos')),
+                    );
+                    return;
+                  }
 
+                  final precio =
+                      double.tryParse(precioCtrl.text.trim());
+                  if (precio == null || precio <= 0) {
+                    ScaffoldMessenger.of(ctx).showSnackBar(
+                      const SnackBar(
+                          content: Text('Precio inválido')),
+                    );
+                    return;
+                  }
 
-            CustomButton(
-              texto: widget.isEditing ? "Guardar cambios" : "Agregar producto",
-              funcion: () => Navigator.pop(context),
-            ),
-          ],
+                  final producto = Product(
+                    nombre: nombreCtrl.text.trim(),
+                    precioIndividual: precio.toString(),
+                    cantidadInicial:
+                        cantidadCtrl.text.trim().isEmpty
+                            ? '1'
+                            : cantidadCtrl.text.trim(),
+                    descuento:
+                        descuentoCtrl.text.trim().isEmpty
+                            ? '0'
+                            : descuentoCtrl.text.trim(),
+                    descripcion: descripcionCtrl.text.trim(),
+                  );
+
+                  Navigator.of(ctx).pop(producto);
+                },
+              ),
+              const SizedBox(height: 30),
+            ],
+          ),
         ),
-      ),
-    );
-  }
+      );
+    },
+  );
 }
