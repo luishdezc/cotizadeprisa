@@ -147,7 +147,7 @@ class _FacturacionPageState extends State<FacturacionPage> {
       nombre: c.nombre, descripcion: c.descripcion,
       precioUnitario: c.precioUnitario, cantidad: c.cantidad,
       descuentoPct: c.descuentoPct,
-      claveProdServ: ConceptoCotizacion.claveProdServDefault,
+      claveProdServ: c.satKey.isNotEmpty ? c.satKey : '01010101',
       claveUnidad: ConceptoCotizacion.claveUnidadDefault,
     )).toList();
 
@@ -180,7 +180,7 @@ class _FacturacionPageState extends State<FacturacionPage> {
       builder: (_) => CupertinoAlertDialog(
         title: const Text('¿Timbrar ante el SAT?'),
         content: const Text(
-            'Facturapi generará y timbrerá el CFDI ante el SAT.\n'
+            'Se generará y timbrerá el CFDI ante el SAT.\n'
             'Una vez timbrada, la factura será inmutable.'),
         actions: [
           CupertinoDialogAction(isDestructiveAction: true,
@@ -195,7 +195,7 @@ class _FacturacionPageState extends State<FacturacionPage> {
     if (conf != true) return;
 
     setState(() => _guardando = true);
-    _showLoading('Timbrando con Facturapi…');
+    _showLoading('Timbrando…');
 
     final f = await _obtenerOCrear();
     if (f == null) {
@@ -374,9 +374,9 @@ class _FacturacionPageState extends State<FacturacionPage> {
               child: Row(children: [
                 Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Text(c.nombre, style: const TextStyle(fontSize: 13)),
-                  Text('ClaveProd: ${ConceptoCotizacion.claveProdServDefault}'
-                       '  ·  Unidad: ${ConceptoCotizacion.claveUnidadDefault}',
-                      style: const TextStyle(fontSize: 10, color: Colors.grey)),
+                  Text(
+                    'Clave SAT: ${c.satKey}  ·  ${c.subcategory.isNotEmpty ? c.subcategory : "Sin categoría"}',
+                    style: const TextStyle(fontSize: 10, color: Colors.grey)),
                 ])),
                 Text('\$${fmt.format(c.subtotal)}',
                     style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
@@ -394,7 +394,7 @@ class _FacturacionPageState extends State<FacturacionPage> {
             label: _timbrada ? 'Factura Timbrada ✓' : '1. Timbrar Factura',
             sub: _timbrada
                 ? 'UUID: ${_factura?.uuid?.substring(0, 8) ?? ""}...'
-                : 'Facturapi genera y timbra el CFDI ante el SAT',
+                : 'Genera y timbra el CFDI ante el SAT',
             color: _timbrada ? const Color(0xFF3D8F8F) : const Color(0xFF6DB1B1),
             disabled: _timbrada || _guardando,
             onTap: _timbrar,

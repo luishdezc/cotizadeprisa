@@ -14,13 +14,11 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  // Inicializamos en 1 para que la pantalla por defecto sea "Nuevo Invoice" al entrar.
   int currentPageIndex = 1;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // Dependiendo del index seleccionado, mostramos la pantalla correspondiente
       body:  [
         const HistorialPage(),
         const NewInvoicePage(),
@@ -28,7 +26,6 @@ class _HomePageState extends State<HomePage> {
         const ProfileScreen(),
       ][currentPageIndex],
 
-      // NavigationBar con el formato de tu archivo bNavPage.dart
       bottomNavigationBar: NavigationBar(
         selectedIndex: currentPageIndex,
         onDestinationSelected: (value) {

@@ -124,12 +124,15 @@ class _LoginPageState extends State<LoginPage> {
                     name: "Correo electrónico",
                     variable: correoController,
                     icon: LucideIcons.mail,
+                    isEmail: true,
                   ),
                   const SizedBox(height: 15),
 
                   CustomTextField(
                     name: "Contraseña",
                     variable: passwordController,
+                    icon: LucideIcons.lock,
+                    obscureText: true,
                   ),
                   const SizedBox(height: 12),
 
@@ -190,7 +193,9 @@ class _LoginPageState extends State<LoginPage> {
                             OutlinedButton.icon(
                               onPressed: _isLoading ? null : _handleGoogleLogin,
                               icon: Image.network(
-                                'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRvUEPcQkCb9DNjiN5j_uL51VMehMlc6ye5AQ&s',
+                                isDark
+                                  ? 'https://img.unocero.com/2021/03/google.jpeg'
+                                  : 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRvUEPcQkCb9DNjiN5j_uL51VMehMlc6ye5AQ&s',
                                 height: 20,
                                 errorBuilder: (context, error, stackTrace) => const Icon(Icons.account_circle),
                               ),

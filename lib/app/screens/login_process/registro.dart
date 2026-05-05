@@ -116,6 +116,7 @@ class _RegistroPageState extends State<RegistroPage> {
                     name: "Nombre completo",
                     variable: nombreController,
                     icon: LucideIcons.user,
+                    textCapitalization: TextCapitalization.words,
                   ),
                   const SizedBox(height: 15),
 
@@ -123,12 +124,15 @@ class _RegistroPageState extends State<RegistroPage> {
                     name: "Correo electrónico",
                     variable: correoController,
                     icon: LucideIcons.mail,
+                    isEmail: true, 
                   ),
                   const SizedBox(height: 15),
 
                   CustomTextField(
+                    icon: LucideIcons.lock, 
                     name: "Contraseña",
                     variable: passwordController,
+                    obscureText: true, 
                   ),
                   const SizedBox(height: 20),
 

@@ -94,7 +94,7 @@ class IntroPage2 extends StatelessWidget {
                     child: const Text(
                       "Guardar y Continuar",
                       style: TextStyle(fontWeight: FontWeight.w500),
-                    ), // Move saving logic to the last screen
+                    ),
                   ),
                   const SizedBox(height: 30),
                 ],

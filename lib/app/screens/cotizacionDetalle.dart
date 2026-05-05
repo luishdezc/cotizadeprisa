@@ -12,7 +12,6 @@ import 'package:intl/intl.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:provider/provider.dart';
 
-
 class CotizacionDetallePage extends StatefulWidget {
   final Cotizacion cot;
   const CotizacionDetallePage({super.key, required this.cot});
@@ -29,7 +28,6 @@ class _CotizacionDetallePageState extends State<CotizacionDetallePage> {
     super.initState();
     _cot = widget.cot;
   }
-
 
   void _sincronizar(BuildContext context) {
     final provider = context.read<AppProvider>();
@@ -200,6 +198,9 @@ class _CotizacionDetallePageState extends State<CotizacionDetallePage> {
       nombre: c.nombre, precioIndividual: c.precioUnitario.toString(),
       cantidadInicial: c.cantidad.toString(), descuento: c.descuentoPct.toString(),
       descripcion: c.descripcion,
+      category: c.category,
+      subcategory: c.subcategory,
+      satKey: c.satKey,
     )).toList();
     final logoPath = context.read<AppProvider>().logoPath;
     displayPdf(context,

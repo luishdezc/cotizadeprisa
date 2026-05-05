@@ -162,11 +162,9 @@ class _HistorialPageState extends State<HistorialPage>
 
   Widget _buildFacturasList(List<Factura> list, bool loading) {
     if (loading) return const Center(child: CircularProgressIndicator());
-    if (list.isEmpty) {
-      return _empty(
+    if (list.isEmpty) return _empty(
         'No hay facturas\nPresiona "Facturar" en una cotización para generar una',
         LucideIcons.receiptText);
-    }
     return RefreshIndicator(
       onRefresh: () => _recargarDesdeFirebase(context),
       child: ListView.separated(

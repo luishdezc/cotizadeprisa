@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cotizadeprisa/app/config/sat_catalog.dart';
 
 enum EstadoCotizacion { borrador, enviada, aceptada, rechazada, facturada }
 
@@ -36,6 +37,7 @@ extension EstadoCotizacionX on EstadoCotizacion {
   bool get editable => this != EstadoCotizacion.facturada;
 }
 
+
 class ConceptoCotizacion {
   final String nombre;
   final String descripcion;
@@ -43,8 +45,13 @@ class ConceptoCotizacion {
   final int cantidad;
   final double descuentoPct;
 
-  static const String claveProdServDefault = '01010101';
-  static const String claveUnidadDefault   = 'H87';
+  final String category;
+
+  final String subcategory;
+
+  final String satKey;
+
+  static const String claveUnidadDefault = 'H87';
 
   const ConceptoCotizacion({
     required this.nombre,
@@ -52,6 +59,9 @@ class ConceptoCotizacion {
     required this.precioUnitario,
     required this.cantidad,
     this.descuentoPct = 0,
+    this.category = '',
+    this.subcategory = '',
+    this.satKey = '01010101',
   });
 
   double get subtotal =>
@@ -66,8 +76,11 @@ class ConceptoCotizacion {
         'precioUnitario': precioUnitario,
         'cantidad': cantidad,
         'descuentoPct': descuentoPct,
-        'claveProdServ': claveProdServDefault,
+        'claveProdServ': satKey,
         'claveUnidad': claveUnidadDefault,
+        'category': category,
+        'subcategory': subcategory,
+        'satKey': satKey,
       };
 
   factory ConceptoCotizacion.fromMap(Map<String, dynamic> m) =>
@@ -77,6 +90,9 @@ class ConceptoCotizacion {
         precioUnitario: (m['precioUnitario'] as num?)?.toDouble() ?? 0,
         cantidad: (m['cantidad'] as num?)?.toInt() ?? 1,
         descuentoPct: (m['descuentoPct'] as num?)?.toDouble() ?? 0,
+        category: m['category'] ?? '',
+        subcategory: m['subcategory'] ?? '',
+        satKey: m['satKey'] ?? m['claveProdServ'] ?? '01010101',
       );
 
   String get precioIndividual => precioUnitario.toString();
@@ -84,6 +100,7 @@ class ConceptoCotizacion {
   String get descuento        => descuentoPct.toString();
   double get totalwithDiscount => subtotal;
 }
+
 
 class Cotizacion {
   final String id;

@@ -56,7 +56,7 @@ class LogoButton extends StatelessWidget {
                       ClipRRect(
                         borderRadius: BorderRadius.circular(8),
                         child: Image.file(
-                          File(logoPath),
+                          File(logoPath!),
                           width: 64,
                           height: 64,
                           fit: BoxFit.contain,

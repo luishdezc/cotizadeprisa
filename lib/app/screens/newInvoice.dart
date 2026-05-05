@@ -53,6 +53,9 @@ class _NewInvoicePageState extends State<NewInvoicePage> {
       nombre: con.nombre, precioIndividual: con.precioUnitario.toString(),
       cantidadInicial: con.cantidad.toString(), descuento: con.descuentoPct.toString(),
       descripcion: con.descripcion,
+      category: con.category,
+      subcategory: con.subcategory,
+      satKey: con.satKey,
     )).toList();
   }
 
@@ -89,6 +92,9 @@ class _NewInvoicePageState extends State<NewInvoicePage> {
       precioUnitario: double.tryParse(p.precioIndividual) ?? 0,
       cantidad: int.tryParse(p.cantidadInicial) ?? 1,
       descuentoPct: double.tryParse(p.descuento) ?? 0,
+      category: p.category,
+      subcategory: p.subcategory,
+      satKey: p.satKey,
     )).toList();
 
     if (_esEdicion) {
@@ -171,7 +177,7 @@ class _NewInvoicePageState extends State<NewInvoicePage> {
                   ),
                   actions: [
                     IconButton(
-                      icon: const Icon(LucideIcons.eraser, color: Color.fromARGB(255, 120, 140, 140)),
+                      icon: const Icon(LucideIcons.eraser, color: Color.fromARGB(255, 124, 124, 140)),
                       tooltip: 'Limpiar formulario',
                       onPressed: () async {
                         final ok = await showCupertinoDialog<bool>(

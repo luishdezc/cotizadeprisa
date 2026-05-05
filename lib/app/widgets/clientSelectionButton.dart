@@ -1,105 +1,93 @@
-
-
-import 'package:cotizadeprisa/app/models/borderDesign.dart';
-import 'package:cotizadeprisa/app/models/cliente.dart';
-import 'package:cotizadeprisa/app/screens/selectClient.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-class ClientSelectionButton extends StatefulWidget {
+class ClientSelectionButton extends StatelessWidget {
+  final String name;
+  final VoidCallback? onTap;
+  final bool isSelected;
+  final String? rfc;
 
   const ClientSelectionButton({
     super.key,
-    this.image,
     required this.name,
-
-    this.isRequired = false,
+    this.onTap,
+    this.isSelected = false,
+    this.rfc,
   });
-
-  final String? image;
-  final String name;
-  final bool isRequired;
-
-  @override
-  State<ClientSelectionButton> createState() => _ClientSelectionButtonState();
-}
-
-class _ClientSelectionButtonState extends State<ClientSelectionButton> {
-
-  bool validate = false;
-  Cliente? _selectedClient;
 
   @override
   Widget build(BuildContext context) {
+    final color = isSelected
+        ? const Color(0xFF6DB1B1)
+        : Theme.of(context).hintColor.withOpacity(0.4);
 
-    return InkWell(
-
-      onTap: () async {
-
-        Navigator.of(context).push(
-          CupertinoPageRoute(
-            builder: (context) => const SelectClientePage(
-              title: 'Selecciona un cliente', 
-              filters: [],
-            ),
-          ),
-        );
-
-        
-      },
-
-      child: InputDecorator(
-      
-      
-        decoration:InputDecoration(
-
-
-          //A espera de implementacion de que el SearchablePage que tenga los clientes, al darle click regrese el valor del cliente:
-          //Al seleccionar un cliente:
-          // -Label dirá Cliente
-          // -El Text dirá el cliente seleccionado
-          // -- Se guardará en una variable el id del cliente para luego sacar todos sus datos para la facturación
-
-
-          // label: Text(
-          //   "Cliente",
-          //   style: TextStyle(
-          //     color: Theme.of(context).hintColor,
-          //     fontSize: 18,
-          //   ),
-          // ),
-
-
-          prefixIcon: Padding(
-            padding: const EdgeInsets.only(left: 2),
-            child: Icon(LucideIcons.user, color: Theme.of(context).hintColor),
-          ),
-      
-          suffixIcon: Icon(LucideIcons.chevronRight, color: Theme.of(context).hintColor),
-
-
-          enabledBorder: borderDesgin(context),
-          focusedBorder: borderDesgin(context),
-
-
-          errorText: (validate &&
-                  
-                  widget.isRequired)
-              ? 'Este campo es obligatorio'
-              : null,
-
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        decoration: BoxDecoration(
+          border: Border.all(color: color, width: isSelected ? 1.5 : 1),
+          borderRadius: BorderRadius.circular(10),
+          color: isSelected
+              ? const Color(0xFF6DB1B1).withOpacity(0.06)
+              : Colors.transparent,
         ),
-      
-
-        child: Text(
-            _selectedClient?.nombre ?? widget.name,
-            style: TextStyle(
-              color: _selectedClient != null ? Colors.black87 : Theme.of(context).hintColor,
-              fontSize: 18,
+        child: Row(
+          children: [
+            Icon(
+              isSelected ? LucideIcons.userCheck : LucideIcons.userPlus,
+              size: 20,
+              color: isSelected
+                  ? const Color(0xFF6DB1B1)
+                  : Theme.of(context).hintColor,
             ),
-          ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    isSelected ? 'Cliente seleccionado' : 'Seleccionar cliente',
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: isSelected
+                          ? const Color(0xFF6DB1B1)
+                          : Theme.of(context).hintColor.withOpacity(0.7),
+                    ),
+                  ),
+                  Text(
+                    name,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: isSelected
+                          ? FontWeight.w600
+                          : FontWeight.normal,
+                      color: isSelected
+                          ? const Color(0xFF3D8F8F)
+                          : Theme.of(context).hintColor,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  if (isSelected && rfc != null)
+                    Text(
+                      'RFC: $rfc',
+                      style: const TextStyle(
+                          fontSize: 11, color: Color(0xFF919191)),
+                    ),
+                ],
+              ),
+            ),
+            Icon(
+              LucideIcons.chevronRight,
+              size: 16,
+              color: isSelected
+                  ? const Color(0xFF6DB1B1)
+                  : Theme.of(context).hintColor,
+            ),
+          ],
         ),
-      );
+      ),
+    );
   }
 }

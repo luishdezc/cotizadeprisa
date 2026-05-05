@@ -15,6 +15,9 @@ class Product extends StatefulWidget {
     required this.cantidadInicial,
     required this.descuento,
     required this.descripcion,
+    this.category = '',
+    this.subcategory = '',
+    this.satKey = '01010101',
     this.onDelete,
     this.onUpdated,
   });
@@ -24,6 +27,12 @@ class Product extends StatefulWidget {
   String cantidadInicial;
   String descripcion;
   String descuento;
+
+  String category;
+
+  String subcategory;
+
+  String satKey;
 
   VoidCallback? onDelete;
   ValueChanged<Product>? onUpdated;
@@ -72,18 +81,31 @@ class _ProductState extends State<Product> {
       children: [
         Row(children: [
           Expanded(
-            child: Text(
-              widget.nombre,
-              overflow: TextOverflow.ellipsis,
-              maxLines: 2,
-              softWrap: true,
-              style: TextStyle(
-                  fontSize: 14, color: Theme.of(context).hintColor, height: 1),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  widget.nombre,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 2,
+                  style: TextStyle(
+                      fontSize: 14,
+                      color: Theme.of(context).hintColor,
+                      height: 1),
+                ),
+                if (widget.subcategory.isNotEmpty)
+                  Text(
+                    '${widget.category} › ${widget.subcategory}',
+                    style: const TextStyle(
+                        fontSize: 10, color: Color(0xFF919191)),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+              ],
             ),
           ),
           _buildMenu(),
         ]),
-        const SizedBox(height: 10),
+        const SizedBox(height: 8),
         _buildPriceRow(context),
       ],
     );
@@ -106,6 +128,9 @@ class _ProductState extends State<Product> {
                 widget.cantidadInicial  = updated.cantidadInicial;
                 widget.descuento        = updated.descuento;
                 widget.descripcion      = updated.descripcion;
+                widget.category         = updated.category;
+                widget.subcategory      = updated.subcategory;
+                widget.satKey           = updated.satKey;
                 cantidadController.text = updated.cantidadInicial;
               });
               widget.onUpdated?.call(widget);
@@ -148,11 +173,10 @@ class _ProductState extends State<Product> {
                 SizedBox(
                   width: 100,
                   child: Text(
-                    NumberFormat('#,##0.00').format(
-                        double.tryParse(widget.precioIndividual) ?? 0),
+                    NumberFormat('#,##0.00')
+                        .format(double.tryParse(widget.precioIndividual) ?? 0),
                     style: TextStyle(
-                        fontSize: 11,
-                        color: Theme.of(context).shadowColor),
+                        fontSize: 11, color: Theme.of(context).shadowColor),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
