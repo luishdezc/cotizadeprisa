@@ -1,368 +1,319 @@
+import 'dart:io';
+import 'package:cotizadeprisa/app/models/empresa_perfil.dart';
+import 'package:cotizadeprisa/app/providers/app_provider.dart';
 import 'package:cotizadeprisa/app/widgets/Texts.dart';
-import 'package:flutter/material.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:cotizadeprisa/app/widgets/customCard.dart';
 import 'package:cotizadeprisa/app/widgets/customTextField.dart';
 import 'package:cotizadeprisa/app/widgets/logoButton.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:provider/provider.dart';
-import 'package:cotizadeprisa/app/providers/app_provider.dart';
 
 
 class ProfileSettingsScreen extends StatefulWidget {
   const ProfileSettingsScreen({super.key});
-
   @override
   State<ProfileSettingsScreen> createState() => _ProfileSettingsScreenState();
 }
 
 class _ProfileSettingsScreenState extends State<ProfileSettingsScreen> {
-  final TextEditingController nombre = TextEditingController();
-  final TextEditingController slogan = TextEditingController();
-  final TextEditingController correo = TextEditingController();
-  final TextEditingController telefono = TextEditingController();
-  final TextEditingController usuario = TextEditingController();
-  final TextEditingController direccion = TextEditingController();
-  final TextEditingController rfc = TextEditingController();
-  final TextEditingController impuesto = TextEditingController();
+  final _nombre     = TextEditingController();
+  final _slogan     = TextEditingController();
+  final _correo     = TextEditingController();
+  final _telefono   = TextEditingController();
+  final _usuario    = TextEditingController();
+  final _direccion  = TextEditingController();
+  final _rfc        = TextEditingController();
+  final _cp         = TextEditingController();
+  final _impuesto   = TextEditingController();
+  final _regimen    = TextEditingController();
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        title: const TitleText(text: 'Actualizar Datos'),
-      ),
-
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {},
-        backgroundColor: const Color.fromARGB(255, 253, 170, 41),
-        child: const Icon(LucideIcons.save, color: Colors.white),
-      ),
-
-      body: SingleChildScrollView(
-        child: Container(
-          constraints: BoxConstraints(
-            minHeight: MediaQuery.of(context).size.height,
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Column(
-              children: [
-                const SizedBox(height: 20),
-                DatosDeEmpresaSection(
-                  nombre: nombre,
-                  slogan: slogan,
-                  correo: correo,
-                  telefono: telefono,
-                  usuario: usuario,
-                  direccion: direccion,
-                  rfc: rfc,
-                ),
-                const SizedBox(height: 20),
-                DatosDePagoSection(impuesto: impuesto),
-                const SizedBox(height: 20),
-                const CertificadosSATSection(),
-                const SizedBox(height: 100),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class DatosDeEmpresaSection extends StatelessWidget {
-  final TextEditingController nombre, slogan, correo, telefono, usuario, direccion, rfc;
-  const DatosDeEmpresaSection({
-    super.key, required this.nombre, required this.slogan, required this.correo,
-    required this.telefono, required this.usuario, required this.direccion, required this.rfc,
-  });
-  @override
-  Widget build(BuildContext context) {
-    return CustomCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text('Datos de la empresa',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
-          const SizedBox(height: 25),
-          ListView.separated(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: _formFields(nombre, slogan, correo, telefono, usuario, direccion, rfc).length,
-            separatorBuilder: (_, __) => const SizedBox(height: 25),
-            itemBuilder: (context, i) => _formFields(nombre, slogan, correo, telefono, usuario, direccion, rfc)[i],
-          ),
-          const LogoButton(),
-        ],
-      ),
-    );
-  }
-}
-
-class DatosDePagoSection extends StatelessWidget {
-  final TextEditingController impuesto;
-  const DatosDePagoSection({super.key, required this.impuesto});
-  @override
-  Widget build(BuildContext context) {
-    return CustomCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text('Datos del pago',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
-          const SizedBox(height: 25),
-          ListView.separated(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: _priceFields(impuesto).length,
-            separatorBuilder: (_, __) => const SizedBox(height: 25),
-            itemBuilder: (context, i) => _priceFields(impuesto)[i],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class CertificadosSATSection extends StatefulWidget {
-  const CertificadosSATSection({super.key});
-  @override
-  State<CertificadosSATSection> createState() => _CertificadosSATSectionState();
-}
-
-class _CertificadosSATSectionState extends State<CertificadosSATSection> {
-  String? _nombreCer;
-  String? _nombreKey;
-  final TextEditingController _pwdCtrl = TextEditingController();
+  // CSD
+  String? _cerPath, _cerNombre, _keyPath, _keyNombre;
+  final _pwdCtrl = TextEditingController();
   bool _showPwd = false;
 
-  void _simularSeleccion(String ext) {
-    showCupertinoDialog(
-      context: context,
-      builder: (_) => CupertinoAlertDialog(
-        title: Text('Seleccionar archivo .$ext'),
-        content: Text(
-          'Aquí se abrirá el selector de archivos para el certificado .$ext '
-          '(pendiente de integrar con file_picker).',
-        ),
-        actions: [
-          CupertinoDialogAction(
-            onPressed: () {
-              Navigator.pop(context);
-              setState(() {
-                if (ext == 'cer') _nombreCer = 'certificado_prueba.cer';
-                else _nombreKey = 'llave_privada.key';
-              });
-            },
-            child: const Text('Simular selección'),
-          ),
-          CupertinoDialogAction(
-            isDestructiveAction: true,
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancelar'),
-          ),
-        ],
-      ),
-    );
-  }
+  bool _guardando = false;
+  bool _cargado   = false;
 
-  void _guardar() {
-    if (_nombreCer == null || _nombreKey == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Selecciona ambos archivos (.cer y .key)')));
-      return;
-    }
-    if (_pwdCtrl.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Ingresa la contraseña de la llave privada')));
-      return;
-    }
-    context.read<AppProvider>().setCertificados(
-      cerPath: _nombreCer!, keyPath: _nombreKey!, password: _pwdCtrl.text);
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Certificados guardados'), backgroundColor: Color(0xFF6DB1B1)));
-  }
-
-  void _limpiar() {
-    context.read<AppProvider>().limpiarCertificados();
-    setState(() { _nombreCer = null; _nombreKey = null; _pwdCtrl.clear(); });
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _cargar());
   }
 
   @override
-  Widget build(BuildContext context) {
-    final activos = context.watch<AppProvider>().certificadosCargados;
-
-    return CustomCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Encabezado
-          Row(children: [
-            const Icon(LucideIcons.shieldCheck, size: 20, color: Color(0xFF6DB1B1)),
-            const SizedBox(width: 8),
-            const Expanded(
-              child: Text('Certificados para Timbrado (SAT)',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700))),
-            if (activos)
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF6DB1B1).withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: const Text('Activos',
-                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF3D8F8F))),
-              ),
-          ]),
-          const SizedBox(height: 6),
-          Text(
-            'Sube tu certificado .cer y llave privada .key para timbrar facturas ante el SAT. ',
-            style: TextStyle(fontSize: 12, color: Theme.of(context).hintColor.withValues(alpha: 0.7)),
-          ),
-          const SizedBox(height: 20),
-
-          // Archivo .cer
-          _FileSelector(
-            label: 'Certificado (.cer)', ext: 'cer', icon: LucideIcons.fileBadge,
-            nombre: _nombreCer,
-            onTap: () => _simularSeleccion('cer'),
-            onClear: () => setState(() => _nombreCer = null),
-          ),
-          const SizedBox(height: 14),
-
-          _FileSelector(
-            label: 'Llave privada (.key)', ext: 'key', icon: LucideIcons.keyRound,
-            nombre: _nombreKey,
-            onTap: () => _simularSeleccion('key'),
-            onClear: () => setState(() => _nombreKey = null),
-          ),
-          const SizedBox(height: 14),
-
-          TextField(
-            controller: _pwdCtrl,
-            obscureText: !_showPwd,
-            decoration: InputDecoration(
-              labelText: 'Contraseña de la llave privada',
-              prefixIcon: const Icon(LucideIcons.lock, size: 18),
-              suffixIcon: GestureDetector(
-                onTap: () => setState(() => _showPwd = !_showPwd),
-                child: Icon(_showPwd ? LucideIcons.eyeOff : LucideIcons.eye, size: 18),
-              ),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-            ),
-          ),
-          const SizedBox(height: 20),
-
-          Row(children: [
-            if (activos) ...[
-              Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: _limpiar,
-                  icon: const Icon(LucideIcons.trash2, size: 16),
-                  label: const Text('Limpiar'),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: Colors.red, side: const BorderSide(color: Colors.red),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-            ],
-            Expanded(
-              flex: 2,
-              child: ElevatedButton.icon(
-                onPressed: _guardar,
-                icon: const Icon(LucideIcons.save, size: 16),
-                label: const Text('Guardar certificados'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF6DB1B1), foregroundColor: Colors.white,
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                ),
-              ),
-            ),
-          ]),
-        ],
-      ),
-    );
+  void dispose() {
+    for (final c in [_nombre,_slogan,_correo,_telefono,_usuario,_direccion,_rfc,_cp,_impuesto,_regimen,_pwdCtrl]) {
+      c.dispose();
+    }
+    super.dispose();
   }
-}
 
-class _FileSelector extends StatelessWidget {
-  final String label, ext;
-  final IconData icon;
-  final String? nombre;
-  final VoidCallback onTap, onClear;
-  const _FileSelector({
-    required this.label, required this.ext, required this.icon,
-    required this.nombre, required this.onTap, required this.onClear,
-  });
+  void _cargar() {
+    if (_cargado) return;
+    final p = context.read<AppProvider>().perfil;
+    if (p == null) return;
+    _nombre.text   = p.nombre;
+    _slogan.text   = p.slogan;
+    _correo.text   = p.correo;
+    _telefono.text = p.telefono;
+    _usuario.text  = p.usuario;
+    _direccion.text= p.direccion;
+    _rfc.text      = p.rfc;
+    _cp.text       = p.codigoPostal;
+    _impuesto.text = p.impuesto.toString();
+    _regimen.text  = p.regimenFiscal;
+    _cargado = true;
+    if (mounted) setState(() {});
+  }
+
+  String? _validar() {
+    if (_nombre.text.trim().isEmpty) return 'El nombre de la empresa es obligatorio';
+    if (_rfc.text.trim().isEmpty) return 'El RFC es obligatorio';
+    if (_cp.text.trim().length != 5) return 'El código postal debe tener 5 dígitos';
+    return null;
+  }
+
+  Future<void> _seleccionarArchivo(String ext) async {
+    final r = await FilePicker.platform.pickFiles(
+        type: FileType.custom, allowedExtensions: [ext]);
+    if (r == null || r.files.isEmpty) return;
+    setState(() {
+      if (ext == 'cer') { _cerPath = r.files.first.path; _cerNombre = r.files.first.name; }
+      else              { _keyPath = r.files.first.path; _keyNombre = r.files.first.name; }
+    });
+  }
+
+  Future<void> _guardarCertificados() async {
+    final provider = context.read<AppProvider>();
+    if (_cerPath != null && _keyPath != null && _pwdCtrl.text.isNotEmpty) {
+      provider.setCertificados(
+          cerPath: _cerPath!, keyPath: _keyPath!, password: _pwdCtrl.text);
+      _snack('Certificados cargados correctamente', ok: true);
+    } else {
+      _snack('Selecciona .cer, .key y escribe la contraseña');
+    }
+  }
+
+  Future<void> _guardar() async {
+    final err = _validar();
+    if (err != null) { _snack(err); return; }
+
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) return;
+
+    setState(() => _guardando = true);
+    final perfil = EmpresaPerfil(
+      uid: uid, nombre: _nombre.text.trim(), slogan: _slogan.text.trim(),
+      correo: _correo.text.trim(), telefono: _telefono.text.trim(),
+      usuario: _usuario.text.trim(), direccion: _direccion.text.trim(),
+      codigoPostal: _cp.text.trim(), rfc: _rfc.text.trim().toUpperCase(),
+      regimenFiscal: _regimen.text.trim().isNotEmpty ? _regimen.text.trim() : '601',
+      impuesto: double.tryParse(_impuesto.text) ?? 16.0,
+    );
+
+    final ok = await context.read<AppProvider>().guardarPerfil(perfil);
+    setState(() => _guardando = false);
+    if (!mounted) return;
+    _snack(ok ? 'Perfil guardado' : 'Error al guardar', ok: ok);
+    if (ok) Navigator.of(context).pop();
+  }
+
+  void _snack(String msg, {bool ok = false}) =>
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(msg),
+          backgroundColor: ok ? const Color(0xFF6DB1B1) : Colors.red));
 
   @override
   Widget build(BuildContext context) {
-    final cargado = nombre != null;
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-        decoration: BoxDecoration(
-          border: Border.all(
-            color: cargado ? const Color(0xFF6DB1B1) : Theme.of(context).shadowColor.withValues(alpha: 0.4),
-            width: cargado ? 1.5 : 1,
-          ),
-          borderRadius: BorderRadius.circular(10),
-          color: cargado ? const Color(0xFF6DB1B1).withValues(alpha: 0.06) : Colors.transparent,
-        ),
-        child: Row(children: [
-          Icon(icon, size: 20, color: cargado ? const Color(0xFF6DB1B1) : Theme.of(context).hintColor),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(label, style: TextStyle(fontSize: 12, color: Theme.of(context).hintColor.withValues(alpha: 0.7))),
-              Text(
-                cargado ? nombre! : 'Toca para seleccionar archivo .$ext',
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: cargado ? FontWeight.w600 : FontWeight.normal,
-                  color: cargado ? const Color(0xFF3D8F8F) : Theme.of(context).hintColor,
-                ),
-                overflow: TextOverflow.ellipsis,
-              ),
+    if (!_cargado) WidgetsBinding.instance.addPostFrameCallback((_) => _cargar());
+    final provider  = context.watch<AppProvider>();
+    final logoPath  = provider.logoPath;
+    final certsCarg = provider.certificadosCargados;
+
+    return Scaffold(
+      appBar: AppBar(backgroundColor: Colors.transparent,
+          title: const TitleText(text: 'Datos de la empresa')),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _guardando ? null : _guardar,
+        backgroundColor: const Color(0xFFFDAA29),
+        child: _guardando
+            ? const CircularProgressIndicator(color: Colors.white, strokeWidth: 2)
+            : const Icon(LucideIcons.save, color: Colors.white),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: Column(children: [
+          const SizedBox(height: 20),
+
+          CustomCard(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            const Text('Logo', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
+            const SizedBox(height: 12),
+            if (logoPath != null && File(logoPath).existsSync())
+              Center(child: ClipRRect(borderRadius: BorderRadius.circular(8),
+                  child: Image.file(File(logoPath), height: 80, fit: BoxFit.contain))),
+            const SizedBox(height: 12),
+            const LogoButton(),
+          ])),
+          const SizedBox(height: 16),
+
+          CustomCard(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            const Text('Datos de la empresa',
+                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
+            const SizedBox(height: 12),
+            CustomTextField(icon: LucideIcons.building, name: 'Nombre / Razón Social', variable: _nombre),
+            const SizedBox(height: 14),
+            CustomTextField(icon: LucideIcons.signature, name: 'Slogan', variable: _slogan),
+            const SizedBox(height: 14),
+            CustomTextField(icon: LucideIcons.mail, name: 'Correo', variable: _correo),
+            const SizedBox(height: 14),
+            CustomTextField(icon: LucideIcons.phone, name: 'Teléfono', variable: _telefono),
+            const SizedBox(height: 14),
+            CustomTextField(icon: LucideIcons.user, name: 'Representante', variable: _usuario),
+          ])),
+          const SizedBox(height: 16),
+
+          CustomCard(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            const Text('Datos fiscales (CFDI)',
+                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
+            const SizedBox(height: 4),
+            const Text('Aparecerán en tus facturas CFDI 4.0',
+                style: TextStyle(fontSize: 12, color: Colors.grey)),
+            const SizedBox(height: 12),
+            CustomTextField(icon: LucideIcons.idCardLanyard, name: 'RFC del emisor',
+                variable: _rfc, textCapitalization: TextCapitalization.characters),
+            const SizedBox(height: 14),
+            CustomTextField(icon: LucideIcons.mapPin, name: 'Dirección fiscal', variable: _direccion),
+            const SizedBox(height: 14),
+            CustomTextField(icon: LucideIcons.mailbox, name: 'Código Postal (5 dígitos)',
+                variable: _cp, keyboardType: TextInputType.number, maxLength: 5),
+            const SizedBox(height: 14),
+            CustomTextField(icon: LucideIcons.landmark, name: 'Régimen Fiscal (ej. 601, 626)',
+                variable: _regimen, keyboardType: TextInputType.number),
+            const SizedBox(height: 14),
+            CustomTextField(icon: LucideIcons.percent, name: 'IVA por defecto (%)',
+                variable: _impuesto,
+                keyboardType: const TextInputType.numberWithOptions(decimal: true)),
+          ])),
+          const SizedBox(height: 16),
+
+          CustomCard(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Row(children: [
+              Icon(certsCarg ? LucideIcons.shieldCheck : LucideIcons.shield,
+                  size: 16, color: certsCarg ? const Color(0xFF3D8F8F) : Colors.orange),
+              const SizedBox(width: 8),
+              const Text('Certificados SAT (CSD)',
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
             ]),
-          ),
-          if (cargado)
-            GestureDetector(
-              onTap: onClear,
-              child: const Padding(padding: EdgeInsets.all(4), child: Icon(LucideIcons.x, size: 16, color: Colors.grey)),
-            )
-          else
-            Icon(LucideIcons.upload, size: 16, color: Theme.of(context).hintColor),
+            const SizedBox(height: 6),
+            const Text(
+              'El Certificado de Sello Digital es necesario para generar y timbrar facturas CFDI.',
+              style: TextStyle(fontSize: 12, color: Colors.grey),
+            ),
+            const SizedBox(height: 14),
+
+            _FileRow(
+              label: 'Certificado (.cer)',
+              icon: LucideIcons.fileBadge,
+              nombre: _cerNombre,
+              onTap: () => _seleccionarArchivo('cer'),
+              onClear: () => setState(() { _cerNombre = _cerPath = null; }),
+            ),
+            const SizedBox(height: 12),
+
+            _FileRow(
+              label: 'Llave privada (.key)',
+              icon: LucideIcons.keyRound,
+              nombre: _keyNombre,
+              onTap: () => _seleccionarArchivo('key'),
+              onClear: () => setState(() { _keyNombre = _keyPath = null; }),
+            ),
+            const SizedBox(height: 12),
+
+            TextField(
+              controller: _pwdCtrl,
+              obscureText: !_showPwd,
+              decoration: InputDecoration(
+                labelText: 'Contraseña de la llave privada',
+                prefixIcon: const Icon(LucideIcons.lock, size: 18),
+                suffixIcon: GestureDetector(
+                  onTap: () => setState(() => _showPwd = !_showPwd),
+                  child: Icon(_showPwd ? LucideIcons.eyeOff : LucideIcons.eye, size: 18),
+                ),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              ),
+            ),
+            const SizedBox(height: 14),
+
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: _guardarCertificados,
+                icon: const Icon(LucideIcons.shieldCheck, size: 16),
+                label: const Text('Cargar certificados en memoria'),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: const Color(0xFF6DB1B1),
+                  side: const BorderSide(color: Color(0xFF6DB1B1)),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                ),
+              ),
+            ),
+
+            if (certsCarg) ...[
+              const SizedBox(height: 10),
+              const Row(children: [
+                Icon(LucideIcons.circleCheck, size: 14, color: Color(0xFF3D8F8F)),
+                SizedBox(width: 6),
+                Text('CSD cargado en memoria para timbrado',
+                    style: TextStyle(fontSize: 12, color: Color(0xFF3D8F8F))),
+              ]),
+            ],
+          ])),
+          const SizedBox(height: 100),
         ]),
       ),
     );
   }
 }
 
-List<CustomTextField> _formFields(
-  TextEditingController nombre, TextEditingController slogan, TextEditingController correo,
-  TextEditingController telefono, TextEditingController usuario,
-  TextEditingController direccion, TextEditingController rfc,
-) => [
-  CustomTextField(icon: LucideIcons.building, name: "Nombre de la empresa", variable: nombre),
-  CustomTextField(icon: LucideIcons.signature, name: "Slogan", variable: slogan),
-  CustomTextField(icon: LucideIcons.mail, name: "Correo", variable: correo),
-  CustomTextField(icon: LucideIcons.phone, name: "Teléfono", variable: telefono),
-  CustomTextField(icon: LucideIcons.user, name: "Nombre Completo", variable: usuario),
-  CustomTextField(icon: LucideIcons.mapPin, name: "Dirección", variable: direccion),
-  CustomTextField(icon: LucideIcons.idCardLanyard, name: "RFC", variable: rfc),
-];
-
-List<CustomTextField> _priceFields(TextEditingController impuesto) => [
-  CustomTextField(icon: LucideIcons.percent, name: "Porcentaje de impuesto", variable: impuesto),
-];
+class _FileRow extends StatelessWidget {
+  final String label; final IconData icon; final String? nombre;
+  final VoidCallback onTap, onClear;
+  const _FileRow({required this.label, required this.icon, required this.nombre,
+      required this.onTap, required this.onClear});
+  @override
+  Widget build(BuildContext context) {
+    final ok = nombre != null;
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        decoration: BoxDecoration(
+          border: Border.all(color: ok ? const Color(0xFF6DB1B1) : Theme.of(context).shadowColor.withOpacity(0.4)),
+          borderRadius: BorderRadius.circular(10),
+          color: ok ? const Color(0xFF6DB1B1).withOpacity(0.05) : Colors.transparent,
+        ),
+        child: Row(children: [
+          Icon(icon, size: 18, color: ok ? const Color(0xFF6DB1B1) : Colors.grey),
+          const SizedBox(width: 10),
+          Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(label, style: TextStyle(fontSize: 11, color: Theme.of(context).hintColor.withOpacity(0.7))),
+            Text(ok ? nombre! : 'Toca para seleccionar',
+                style: TextStyle(fontSize: 13, fontWeight: ok ? FontWeight.w600 : FontWeight.normal,
+                    color: ok ? const Color(0xFF3D8F8F) : Colors.grey),
+                overflow: TextOverflow.ellipsis),
+          ])),
+          if (ok)
+            GestureDetector(onTap: onClear,
+                child: const Padding(padding: EdgeInsets.all(4),
+                    child: Icon(LucideIcons.x, size: 15, color: Colors.grey))),
+        ]),
+      ),
+    );
+  }
+}
