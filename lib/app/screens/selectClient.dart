@@ -55,6 +55,8 @@ class _SelectClientePageState extends State<SelectClientePage> {
     final nombreCtrl   = TextEditingController();
     final correoCtrl   = TextEditingController();
     final telefonoCtrl = TextEditingController();
+    final rfcCtrl      = TextEditingController();
+    final cpCtrl       = TextEditingController();
 
     showModalBottomSheet(
       context: context,
@@ -72,11 +74,17 @@ class _SelectClientePageState extends State<SelectClientePage> {
           const Text('Nuevo cliente',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
           const SizedBox(height: 4),
-          const Text('El RFC se solicitará al momento de facturar.',
+          const Text('Datos requeridos para facturación (CFDI 4.0).',
               style: TextStyle(fontSize: 12, color: Colors.grey)),
           const SizedBox(height: 20),
           CustomTextField(name: 'Nombre / Razón Social *',
               variable: nombreCtrl, icon: LucideIcons.user),
+          const SizedBox(height: 14),
+          CustomTextField(name: 'RFC',
+              variable: rfcCtrl, icon: LucideIcons.idCardLanyard, textCapitalization: TextCapitalization.characters),
+          const SizedBox(height: 14),
+          CustomTextField(name: 'Código Postal',
+              variable: cpCtrl, icon: LucideIcons.mailbox, keyboardType: TextInputType.number, maxLength: 5),
           const SizedBox(height: 14),
           CustomTextField(name: 'Correo electrónico',
               variable: correoCtrl, icon: LucideIcons.mail),
@@ -95,7 +103,9 @@ class _SelectClientePageState extends State<SelectClientePage> {
               Navigator.pop(ctx);
               await _crearCliente(Cliente(
                 id: '', nombre: nombreCtrl.text.trim(),
-                rfc: '', correo: correoCtrl.text.trim(),
+                rfc: rfcCtrl.text.trim().toUpperCase(),
+                codigoPostal: cpCtrl.text.trim(),
+                correo: correoCtrl.text.trim(),
                 telefono: telefonoCtrl.text.trim(),
               ));
             },
@@ -111,6 +121,8 @@ class _SelectClientePageState extends State<SelectClientePage> {
     final nombreCtrl   = TextEditingController(text: cliente.nombre);
     final correoCtrl   = TextEditingController(text: cliente.correo);
     final telefonoCtrl = TextEditingController(text: cliente.telefono ?? '');
+    final rfcCtrl      = TextEditingController(text: cliente.rfc);
+    final cpCtrl       = TextEditingController(text: cliente.codigoPostal);
 
     showModalBottomSheet(
       context: context,
@@ -128,11 +140,17 @@ class _SelectClientePageState extends State<SelectClientePage> {
           const Text('Editar cliente',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
           const SizedBox(height: 4),
-          const Text('El RFC se gestiona al momento de facturar.',
+          const Text('Datos requeridos para facturación (CFDI 4.0).',
               style: TextStyle(fontSize: 12, color: Colors.grey)),
           const SizedBox(height: 20),
           CustomTextField(name: 'Nombre / Razón Social *',
               variable: nombreCtrl, icon: LucideIcons.user),
+          const SizedBox(height: 14),
+          CustomTextField(name: 'RFC',
+              variable: rfcCtrl, icon: LucideIcons.idCardLanyard, textCapitalization: TextCapitalization.characters),
+          const SizedBox(height: 14),
+          CustomTextField(name: 'Código Postal',
+              variable: cpCtrl, icon: LucideIcons.mailbox, keyboardType: TextInputType.number, maxLength: 5),
           const SizedBox(height: 14),
           CustomTextField(name: 'Correo electrónico',
               variable: correoCtrl, icon: LucideIcons.mail),
@@ -167,6 +185,8 @@ class _SelectClientePageState extends State<SelectClientePage> {
                 await context.read<AppProvider>().actualizarCliente(uid,
                   cliente.copyWith(
                     nombre: nombreCtrl.text.trim(),
+                    rfc: rfcCtrl.text.trim().toUpperCase(),
+                    codigoPostal: cpCtrl.text.trim(),
                     correo: correoCtrl.text.trim(),
                     telefono: telefonoCtrl.text.trim(),
                   ),

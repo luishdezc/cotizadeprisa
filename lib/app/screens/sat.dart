@@ -2,10 +2,13 @@
 import 'package:cotizadeprisa/app/config/app_config.dart';
 import 'package:cotizadeprisa/app/models/factura.dart';
 import 'package:cotizadeprisa/app/providers/app_provider.dart';
+import 'package:cotizadeprisa/app/screens/pdfFactura.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 
 class SatPage extends StatelessWidget {
@@ -116,6 +119,21 @@ class SatPage extends StatelessWidget {
     );
   }
 
+  Future<void> _abrirPdf(BuildContext context, Factura factura) async {
+    if (factura.pdfUrl != null && factura.pdfUrl!.isNotEmpty) {
+      final uri = Uri.tryParse(factura.pdfUrl!);
+      if (uri != null && await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+        return;
+      }
+    }
+
+    if (context.mounted) {
+      Navigator.of(context).push(
+          CupertinoPageRoute(builder: (_) => PdfFacturaPage(factura: factura)));
+    }
+  }
+
   void _showDetail(BuildContext context, Factura f) {
     showModalBottomSheet(
       context: context,
@@ -149,6 +167,21 @@ class SatPage extends StatelessWidget {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
               ),
             ),
+        const SizedBox(height: 12),
+        SizedBox(width: double.infinity,
+          child: ElevatedButton.icon(
+            onPressed: () {
+              Navigator.pop(context);
+              _abrirPdf(context, f);
+            },
+            icon: const Icon(LucideIcons.fileDown),
+            label: const Text('Ver / Descargar PDF', style: TextStyle(fontWeight: FontWeight.w600)),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent,
+                foregroundColor: Colors.white, elevation: 0,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))),
+          ),
+        ),
         ]),
       ),
     );

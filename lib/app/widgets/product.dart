@@ -236,7 +236,7 @@ class _ProductState extends State<Product> {
                 textAlign: TextAlign.end,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                    fontSize: 17,
+                    fontSize: 14,
                     fontWeight: FontWeight.bold,
                     color: Theme.of(context).hintColor),
               ),

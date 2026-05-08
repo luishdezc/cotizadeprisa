@@ -291,28 +291,38 @@ class _FacturacionPageState extends State<FacturacionPage> {
                     _ChipAutocompletado(),
                 ]),
                 const SizedBox(height: 4),
-                if (!_timbrada)
-                  const Text('Puedes editar los datos antes de timbrar.',
+                if (!_timbrada && _camposFaltantes.isEmpty)
+                  const Text('Datos obtenidos del cliente seleccionado.',
+                      style: TextStyle(fontSize: 12, color: Colors.grey))
+                else if (!_timbrada)
+                  const Text('Faltan datos. Por favor edita el cliente desde su perfil.',
                       style: TextStyle(fontSize: 12, color: Colors.grey)),
                 const SizedBox(height: 14),
                 _Campo(
                   faltante: _camposFaltantes.any((e) => e.toLowerCase().contains('rfc')),
-                  child: CustomTextField(icon: LucideIcons.idCardLanyard,
-                      name: 'RFC del receptor *', variable: _rfcCtrl,
-                      textCapitalization: TextCapitalization.characters),
+                  child: _ReadOnlyField(
+                    icon: LucideIcons.idCardLanyard,
+                    label: 'RFC del receptor',
+                    value: _rfcCtrl.text.isEmpty ? 'Falta RFC' : _rfcCtrl.text,
+                  ),
                 ),
                 const SizedBox(height: 12),
                 _Campo(
                   faltante: _camposFaltantes.any((e) => e.toLowerCase().contains('nombre')),
-                  child: CustomTextField(icon: LucideIcons.building,
-                      name: 'Nombre / Razón social *', variable: _nombreCtrl),
+                  child: _ReadOnlyField(
+                    icon: LucideIcons.building,
+                    label: 'Nombre / Razón social',
+                    value: _nombreCtrl.text.isEmpty ? 'Falta Nombre' : _nombreCtrl.text,
+                  ),
                 ),
                 const SizedBox(height: 12),
                 _Campo(
                   faltante: _camposFaltantes.any((e) => e.toLowerCase().contains('postal')),
-                  child: CustomTextField(icon: LucideIcons.mailbox,
-                      name: 'Código postal *', variable: _cpCtrl,
-                      keyboardType: TextInputType.number, maxLength: 5),
+                  child: _ReadOnlyField(
+                    icon: LucideIcons.mailbox,
+                    label: 'Código postal',
+                    value: _cpCtrl.text.isEmpty ? 'Falta C.P.' : _cpCtrl.text,
+                  ),
                 ),
                 const SizedBox(height: 12),
                 _Drop('Régimen fiscal receptor *', _regimenReceptor,
@@ -620,5 +630,30 @@ class _Btn extends StatelessWidget {
         ]),
       ),
     ),
+  );
+}
+
+class _ReadOnlyField extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+  const _ReadOnlyField({required this.icon, required this.label, required this.value});
+  @override
+  Widget build(BuildContext context) => Container(
+    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+    decoration: BoxDecoration(
+      color: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF2A2A2A) : const Color(0xFFF5F5F5),
+      borderRadius: BorderRadius.circular(10),
+      border: Border.all(color: Colors.grey.withOpacity(0.2)),
+    ),
+    child: Row(children: [
+      Icon(icon, size: 20, color: Colors.grey),
+      const SizedBox(width: 12),
+      Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(label, style: const TextStyle(fontSize: 11, color: Colors.grey)),
+        const SizedBox(height: 2),
+        Text(value, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: value.startsWith('Falta') ? Colors.orange : null)),
+      ])),
+    ]),
   );
 }

@@ -151,7 +151,7 @@ class _NewInvoicePageState extends State<NewInvoicePage> {
     final tasa     = provider.perfil?.impuesto ?? 16.0;
     final iva      = _subtotal * (tasa / 100);
     final total    = _subtotal + iva;
-    final fmt      = NumberFormat('#,##0.00');
+    final fmt      = NumberFormat.currency(locale: 'es_MX', symbol: '\$');
 
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
@@ -222,7 +222,7 @@ class _NewInvoicePageState extends State<NewInvoicePage> {
                           name: 'Título (opcional)', variable: _tituloCtrl),
                       const SizedBox(height: 14),
                       CustomTextField(icon: LucideIcons.layers,
-                          name: 'Asunto *', variable: _asuntoCtrl, multiline: true),
+                          name: 'Asunto', variable: _asuntoCtrl),
                       const SizedBox(height: 14),
                       ClientSelectionButton(
                         name: _cliente?.nombre ?? 'Seleccionar cliente (opcional)',
@@ -266,10 +266,10 @@ class _NewInvoicePageState extends State<NewInvoicePage> {
                           },
                         ),
                         const Divider(height: 24),
-                        _TRow('Subtotal', '\$${fmt.format(_subtotal)}'),
-                        _TRow('IVA (${tasa.toInt()}%)', '\$${fmt.format(iva)}'),
+                        _TRow('Subtotal', fmt.format(_subtotal)),
+                        _TRow('IVA (${tasa.toInt()}%)', fmt.format(iva)),
                         const Divider(height: 8),
-                        _TRow('Total', '\$${fmt.format(total)}', bold: true),
+                        _TRow('Total', fmt.format(total), bold: true),
                       ],
                     ])),
                     const SizedBox(height: 16),
@@ -299,10 +299,10 @@ class _TRow extends StatelessWidget {
   Widget build(BuildContext context) => Padding(
     padding: const EdgeInsets.symmetric(vertical: 3),
     child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-      Text(l, style: TextStyle(fontSize: bold ? 15 : 13,
+      Text(l, style: TextStyle(fontSize: bold ? 18 : 13,
           fontWeight: bold ? FontWeight.bold : FontWeight.normal,
           color: bold ? null : Colors.grey)),
-      Text(v, style: TextStyle(fontSize: bold ? 15 : 13,
+      Text(v, style: TextStyle(fontSize: bold ? 18 : 13,
           fontWeight: bold ? FontWeight.bold : FontWeight.normal,
           color: bold ? const Color(0xFF6DB1B1) : null)),
     ]),

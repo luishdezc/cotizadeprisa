@@ -6,6 +6,7 @@ import 'package:cotizadeprisa/app/screens/cotizacionDetalle.dart';
 import 'package:cotizadeprisa/app/screens/facturacionPage.dart';
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 
@@ -221,6 +222,7 @@ class _CotizacionItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = _statusColor;
+    final fmt = NumberFormat.currency(locale: 'es_MX', symbol: '\$');
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -256,7 +258,7 @@ class _CotizacionItem extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Text(cot.totalFormateado,
+              Text(fmt.format(cot.total),
                   style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
               const SizedBox(height: 4),
               Container(
@@ -295,6 +297,7 @@ class _FacturaItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = _color;
+    final fmt = NumberFormat.currency(locale: 'es_MX', symbol: '\$');
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -333,7 +336,7 @@ class _FacturaItem extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Text(factura.totalFormateado,
+              Text(fmt.format(factura.total),
                   style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
               const SizedBox(height: 4),
               Container(
